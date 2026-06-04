@@ -1,26 +1,84 @@
-const ADMIN_PASSWORD = "1234"; 
+const ADMIN_PASSWORD = "1234"; // Твой пароль для редактирования ДЗ
 let isAdmin = false;
 let currentWeekIndex = 0;
 
-// Глобальная база данных недель (календарь)
-let weeksData = [
-    {
-        weekName: "Неделя 1 (Текущая)",
-        days: [
-            { day: "Понедельник", subjects: [{ name: "Конституционное право", homework: "Читать главу 3.", fileTitle: "Вопросы.pdf", fileUrl: "https://example.com/1.pdf" }] },
-            { day: "Вторник", subjects: [{ name: "Административное право", homework: "Задачи 1-5.", fileTitle: "", fileUrl: "" }] },
-            { day: "Среда", subjects: [] },
-            { day: "Четверг", subjects: [] },
-            { day: "Пятница", subjects: [] },
-            { day: "Суббота", subjects: [] }
-        ]
-    }
-];
+// Твои личные ключи связи с базой данных из Firebase
+const firebaseConfig = {
+    apiKey: "AIzaSyAbqZvv_uMLQRn1hJPqJ8StPHujTiktFug",
+    authDomain: "homework-uubo-03-25.firebaseapp.com",
+    projectId: "homework-uubo-03-25",
+    storageBucket: "homework-uubo-03-25.appspot.com",
+    messagingSenderId: "614943406556",
+    appId: "1:614943406556:web:aa502856127acea2fe7719",
+    measurementId: "G-60XWJN9VTV"
+};
+
+// Инициализация Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+// Локальные копии данных
+let weeksData = [];
+let importantTasksHTML = "<li>Пока важных объявлений нет.</li>";
 
 const container = document.getElementById('schedule-container');
 const weekSelect = document.getElementById('week-select');
+const importantList = document.getElementById('important-list');
 
-// Функция отрисовки выпадающего списка недель (календаря)
+// 1. ЗАГРУЗКА ДАННЫХ ИЗ ОБЛАКА ПРИ ОТКРЫТИИ СТРАНИЦЫ
+async function loadDataFromCloud() {
+    try {
+        const doc = await db.collection("homework_db").doc("main_data").get();
+        
+        if (doc.exists) {
+            const cloudData = doc.data();
+            weeksData = cloudData.weeks || [];
+            importantTasksHTML = cloudData.important || "<li>Пока важных объявлений нет.</li>";
+        } else {
+            // Если база полностью пустая (первый запуск), создаем шаблон
+            weeksData = [{
+                weekName: "Неделя 1 (Текущая)",
+                days: [
+                    { day: "Понедельник", subjects: [] }, { day: "Вторник", subjects: [] },
+                    { day: "Среда", subjects: [] }, { day: "Четверг", subjects: [] },
+                    { day: "Пятница", subjects: [] }, { day: "Суббота", subjects: [] }
+                ]
+            }];
+            importantTasksHTML = "<li><strong>Административное право:</strong> Привет! Войди как староста, чтобы отредактировать меня.</li>";
+            await db.collection("homework_db").doc("main_data").set({ weeks: weeksData, important: importantTasksHTML });
+        }
+        importantList.innerHTML = importantTasksHTML;
+        renderTree();
+    } catch (error) {
+        console.error("Ошибка загрузки из Firebase:", error);
+        alert("Не удалось загрузить данные из облака.");
+    }
+}
+
+// 2. ОТПРАВКА ИЗМЕНЕНИЙ В ОБЛАКО (БЕЗ СКАЧИВАНИЯ ФАЙЛОВ!)
+async function saveDataToCloud() {
+    const saveBtn = document.getElementById('save-btn');
+    saveBtn.innerText = "⏳ Сохранение...";
+    saveBtn.disabled = true;
+
+    // Считываем то, что админ мог поменять в блоке "Важное"
+    importantTasksHTML = importantList.innerHTML;
+
+    try {
+        await db.collection("homework_db").doc("main_data").set({
+            weeks: weeksData,
+            important: importantTasksHTML
+        });
+        alert("🔥 Изменения успешно сохранены в облаке! Все одногруппники увидят их прямо сейчас.");
+    } catch (error) {
+        console.error("Ошибка сохранения:", error);
+        alert("Ошибка при сохранении данных в облако.");
+    } finally {
+        saveBtn.innerText = "💾 Сохранить в облако";
+        saveBtn.disabled = false;
+    }
+}
+
 function renderWeekSelector() {
     weekSelect.innerHTML = "";
     weeksData.forEach((week, index) => {
@@ -32,17 +90,16 @@ function renderWeekSelector() {
     });
 }
 
-// Переключение недели пользователем
 function switchWeek(index) {
     currentWeekIndex = parseInt(index);
     renderTree();
 }
 
-// Отрисовка 6 дней выбранной недели
 function renderTree() {
     container.innerHTML = "";
     renderWeekSelector();
     
+    if (weeksData.length === 0) return;
     const activeWeek = weeksData[currentWeekIndex];
     
     activeWeek.days.forEach((dayData, dayIndex) => {
@@ -88,7 +145,6 @@ function renderTree() {
     });
 }
 
-// Функции обновления данных админом
 function updateSubjectName(dIdx, sIdx, val) { weeksData[currentWeekIndex].days[dIdx].subjects[sIdx].name = val; }
 function updateHomework(dIdx, sIdx, val) { weeksData[currentWeekIndex].days[dIdx].subjects[sIdx].homework = val; }
 function updateFileTitle(dIdx, sIdx, val) { weeksData[currentWeekIndex].days[dIdx].subjects[sIdx].fileTitle = val; }
@@ -104,9 +160,8 @@ function deleteSubject(dIdx, sIdx) {
     renderTree();
 }
 
-// Создание новой недели в календаре
 function createNewWeek() {
-    const name = prompt("Введите название новой недели (например: Неделя 15.09 - 21.09):");
+    const name = prompt("Введите название новой недели (например: Неделя 08.09 - 14.09):");
     if (name) {
         weeksData.push({
             weekName: name,
@@ -116,12 +171,12 @@ function createNewWeek() {
                 { day: "Пятница", subjects: [] }, { day: "Суббота", subjects: [] }
             ]
         });
-        currentWeekIndex = weeksData.length - 1; // Переключаемся на созданную неделю
+        currentWeekIndex = weeksData.length - 1;
         renderTree();
     }
 }
 
-// Авторизация
+// Авторизация старосты
 document.getElementById('login-btn').addEventListener('click', () => {
     const pass = prompt("Введи пароль старосты:");
     if (pass === ADMIN_PASSWORD) {
@@ -129,73 +184,4 @@ document.getElementById('login-btn').addEventListener('click', () => {
         document.getElementById('login-btn').style.display = 'none';
         document.getElementById('save-btn').style.display = 'inline-block';
         document.getElementById('logout-btn').style.display = 'inline-block';
-        document.getElementById('add-week-btn').style.display = 'inline-block';
-        document.getElementById('important-tasks').contentEditable = "true";
-        document.getElementById('important-tasks').classList.add('admin-editable');
-        renderTree();
-    } else { alert("Неверный пароль!"); }
-});
-
-document.getElementById('logout-btn').addEventListener('click', () => {
-    isAdmin = false;
-    document.getElementById('login-btn').style.display = 'inline-block';
-    document.getElementById('save-btn').style.display = 'none';
-    document.getElementById('logout-btn').style.display = 'none';
-    document.getElementById('add-week-btn').style.display = 'none';
-    document.getElementById('important-tasks').contentEditable = "false";
-    document.getElementById('important-tasks').classList.remove('admin-editable');
-    renderTree();
-});
-
-// Кнопка сохранения
-document.getElementById('save-btn').addEventListener('click', () => {
-    const updatedCode = `const ADMIN_PASSWORD = "${ADMIN_PASSWORD}";
-let isAdmin = false;
-let currentWeekIndex = ${currentWeekIndex};
-let weeksData = ${JSON.stringify(weeksData, null, 4)};
-${renderWeekSelector.toString()}
-${switchWeek.toString()}
-${renderTree.toString()}
-${updateSubjectName.toString()}
-${updateHomework.toString()}
-${updateFileTitle.toString()}
-${updateFileUrl.toString()}
-${addSubject.toString()}
-${deleteSubject.toString()}
-${createNewWeek.toString()}
-document.getElementById('login-btn').addEventListener('click', () => {
-    const pass = prompt("Введи пароль старосты:");
-    if (pass === ADMIN_PASSWORD) {
-        isAdmin = true;
-        document.getElementById('login-btn').style.display = 'none';
-        document.getElementById('save-btn').style.display = 'inline-block';
-        document.getElementById('logout-btn').style.display = 'inline-block';
-        document.getElementById('add-week-btn').style.display = 'inline-block';
-        document.getElementById('important-tasks').contentEditable = "true";
-        document.getElementById('important-tasks').classList.add('admin-editable');
-        renderTree();
-    } else { alert("Неверный пароль!"); }
-});
-document.getElementById('logout-btn').addEventListener('click', () => {
-    isAdmin = false;
-    document.getElementById('login-btn').style.display = 'inline-block';
-    document.getElementById('save-btn').style.display = 'none';
-    document.getElementById('logout-btn').style.display = 'none';
-    document.getElementById('add-week-btn').style.display = 'none';
-    document.getElementById('important-tasks').contentEditable = "false";
-    document.getElementById('important-tasks').classList.remove('admin-editable');
-    renderTree();
-});
-document.getElementById('save-btn').addEventListener('click', ${document.getElementById('save-btn').onclick.toString()});
-renderTree();`;
-
-    const blob = new Blob([updatedCode], { type: "text/javascript" });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = "script.js";
-    link.click();
-    alert("Файл 'script.js' успешно обновлен! Замените им старый файл на GitHub.");
-});
-
-// Запуск
-renderTree();
+        document.getElementById('add-week-btn').style.display = '
