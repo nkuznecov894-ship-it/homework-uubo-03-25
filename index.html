@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Домашнее задание группы</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <h1>ДЗ группы УУБО-03-25</h1>
+        <p>Актуальные домашние задания и материалы к парам</p>
+        
+        <div class="week-selector-container">
+            <label for="week-select">📅 Выберите неделю:</label>
+            <select id="week-select" onchange="switchWeek(this.value)">
+                </select>
+            <button id="add-week-btn" class="btn btn-action" style="display: none;" onclick="createNewWeek()">➕ Добавить неделю в календарь</button>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="announcements">
+            <h2>⚠️ Важное на этот семестр</h2>
+            <div id="important-tasks" contenteditable="false">
+                <ul>
+                    <li><strong>Административное право:</strong> Подготовить доклады!</li>
+                    <li><strong>Макроэкономика:</strong> Не забудьте сдать отчеты по практической работе.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="schedule-grid" id="schedule-container">
+            </section>
+    </main>
+
+    <footer>
+        <p>© 2026 УУБО-03-25. Органайзер домашних заданий.</p>
+        <div class="admin-panel">
+            <button id="login-btn" class="btn">🔒 Войти как староста</button>
+            <button id="save-btn" class="btn btn-save" style="display: none;">💾 Сохранить изменения</button>
+            <button id="logout-btn" class="btn btn-danger" style="display: none;">Выйти</button>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

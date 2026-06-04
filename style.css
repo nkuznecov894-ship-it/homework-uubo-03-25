@@ -1,0 +1,125 @@
+:root {
+    --bg-color: #0b0f19;
+    --bg-gradient: radial-gradient(circle at 50% 0%, #1a233a 0%, #0b0f19 70%);
+    --card-bg: rgba(22, 28, 45, 0.6);
+    --card-border: rgba(255, 255, 255, 0.08);
+    --text-color: #f1f5f9;
+    --text-muted: #94a3b8;
+    --accent-blue: #38bdf8;
+    --accent-green: #34d399;
+    --warning-red: #f87171;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    background: var(--bg-color);
+    background: var(--bg-gradient);
+    color: var(--text-color);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    line-height: 1.6;
+    min-height: 100vh;
+    padding-bottom: 60px;
+}
+
+header { text-align: center; padding: 3rem 1rem 2rem; }
+header h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    background: linear-gradient(to right, #fff, var(--accent-blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.5rem;
+}
+header p { color: var(--text-muted); font-size: 1.1rem; margin-bottom: 1.5rem; }
+
+/* Стили календаря / выбора недель */
+.week-selector-container {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 0.6rem 1.2rem;
+    border-radius: 30px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+#week-select {
+    background: #111827;
+    color: #fff;
+    border: 1px solid var(--accent-blue);
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    outline: none;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+
+.announcements {
+    background: rgba(248, 113, 113, 0.03);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(248, 113, 113, 0.15);
+    padding: 1.25rem 1.5rem;
+    border-radius: 14px;
+    margin-bottom: 2.5rem;
+}
+.announcements h2 { color: var(--warning-red); font-size: 1.1rem; text-transform: uppercase; margin-bottom: 0.5rem;}
+.announcements ul { list-style-position: inside; color: #e2e8f0; }
+
+/* Сетка на 6 дней */
+.schedule-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 1.5rem;
+}
+
+.day-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+}
+.day-card h3 {
+    color: #fff;
+    font-size: 1.3rem;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.subject { margin-bottom: 1.25rem; padding-left: 0.75rem; border-left: 2px solid var(--accent-blue); }
+.subject:nth-child(odd) { border-left-color: var(--accent-green); }
+.subject-name { font-weight: 600; color: #fff; display: block; margin-bottom: 0.25rem; }
+.homework { color: var(--text-muted); font-size: 0.9rem; }
+
+.subject-files { margin-top: 0.5rem; display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.file-link {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--accent-blue);
+    padding: 0.25rem 0.6rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    text-decoration: none;
+}
+.file-link:hover { background: rgba(56, 189, 248, 0.1); color: #fff; }
+
+/* Админка */
+.admin-editable { border: 1px dashed rgba(56, 189, 248, 0.5) !important; background: rgba(56, 189, 248, 0.05) !important; padding: 2px 5px; border-radius: 4px; outline: none; }
+.admin-input-group { margin-top: 0.5rem; background: rgba(0,0,0,0.2); padding: 0.5rem; border-radius: 6px; }
+.admin-input-group input { width: 100%; background: #0b0f19; border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 0.3rem; font-size: 0.8rem; border-radius: 4px; margin-bottom: 0.3rem; }
+
+.admin-panel { margin-top: 1rem; }
+.btn { background: rgba(255,255,255,0.05); color: #fff; border: 1px solid rgba(255,255,255,0.1); padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-size: 0.9rem; }
+.btn:hover { background: rgba(255,255,255,0.15); }
+.btn-save { background: #16a34a; border-color: #15803d; }
+.btn-save:hover { background: #15803d; }
+.btn-danger { background: #dc2626; border-color: #b91c1c; }
+.btn-action { padding: 0.2rem 0.5rem; font-size: 0.75rem; margin-top: 0.5rem; }
+
+footer { text-align: center; margin-top: 4rem; padding: 2rem 1rem; border-top: 1px solid rgba(255, 255, 255, 0.05); }
