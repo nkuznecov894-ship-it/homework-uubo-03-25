@@ -184,4 +184,25 @@ document.getElementById('login-btn').addEventListener('click', () => {
         document.getElementById('login-btn').style.display = 'none';
         document.getElementById('save-btn').style.display = 'inline-block';
         document.getElementById('logout-btn').style.display = 'inline-block';
-        document.getElementById('add-week-btn').style.display = '
+        document.getElementById('add-week-btn').style.display = 'inline-block';
+        document.getElementById('important-tasks').contentEditable = "true";
+        document.getElementById('important-tasks').classList.add('admin-editable');
+        renderTree();
+    } else { alert("Неверный пароль!"); }
+});
+
+document.getElementById('logout-btn').addEventListener('click', () => {
+    isAdmin = false;
+    document.getElementById('login-btn').style.display = 'inline-block';
+    document.getElementById('save-btn').style.display = 'none';
+    document.getElementById('logout-btn').style.display = 'none';
+    document.getElementById('add-week-btn').style.display = 'none';
+    document.getElementById('important-tasks').contentEditable = "false";
+    document.getElementById('important-tasks').classList.remove('admin-editable');
+    renderTree();
+});
+
+document.getElementById('save-btn').addEventListener('click', saveDataToCloud);
+
+// Первый запуск и стягивание базы данных
+loadDataFromCloud();
